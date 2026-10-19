@@ -1,7 +1,7 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-const defaultDatabasePath = path.resolve(__dirname, '../../app.db');
+const defaultDatabasePath = path.resolve(__dirname, '../../local_app.db');
 
 function getInstalledGames(databasePath = defaultDatabasePath) {
 	return new Promise((resolve, reject) => {

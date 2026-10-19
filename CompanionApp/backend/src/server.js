@@ -28,9 +28,15 @@ app.get('/api/games', async (req, res) => {
         res.json({ status: 'success', count: games.length, games });
     } catch (error) {
         console.error('Failed to load games:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to load games from the PS5 database.' });
+        const connectionFailure = ['ETIMEDOUT', 'ECONNREFUSED', 'EHOSTUNREACH', 'ENETUNREACH'].includes(error.code);
+        const message = connectionFailure
+            ? `Cannot reach PS5 FTP at ${process.env.PS5_IP}:${process.env.PS5_FTP_PORT}. Check that the console is online, FTP is enabled, and its address and port are correct.`
+            : 'Failed to load games from the PS5 database.';
+        res.status(500).json({ status: 'error', message });
     }
 });
+
+console.log("OKUNAN IP: >" + process.env.PS5_IP + "< PORT: >" + process.env.PS5_FTP_PORT + "<");
 
 app.listen(PORT, () => {
     console.log(`🚀 ProsperoProfile Sunucusu çalışıyor: http://localhost:${PORT}`);
