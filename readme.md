@@ -1,9 +1,9 @@
-![ProsperoProfile Banner](watermarked_img_4068672465495266904.jpg)
+![ProsperoProfile Banner](/CompanionApp/images/wide.jpg)
 
 # ProsperoProfile 
 **The Ultimate PS5 Companion App & Library Manager**
 
-<img align="right" src="watermarked_img_9733982532237070482.jpg" alt="ProsperoProfile Icon" width="120">
+<img align="right" src="/CompanionApp/images/logo.jpg"
 
 ProsperoProfile is a sleek, modern companion application designed for homebrew-enabled PlayStation 5 consoles. It bridges the gap between your console's raw data and a premium user experience, pulling your local game library, playtime statistics, and trophy data directly from the PS5's internal databases. 
 

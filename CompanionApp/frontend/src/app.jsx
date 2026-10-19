@@ -179,12 +179,14 @@ function App() {
 
     async function fetchGames() {
       try {
-        const response = await fetch('/api/games')
+        const response = await fetch('http://localhost:3000/api/games')
         const payload = await response.json()
         if (!response.ok) throw new Error(payload.message || 'Could not reach the game library.')
+        const gameList = Array.isArray(payload) ? payload : payload.games
+        if (!Array.isArray(gameList)) throw new Error('The games API returned an invalid response.')
 
         if (!ignoreResponse) {
-          setGames(Array.isArray(payload.games) ? payload.games : [])
+          setGames(gameList)
           setLastSynced(new Date())
         }
       } catch (loadError) {

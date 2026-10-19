@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { downloadDatabase } = require('./services/ftpService');
-const { getInstalledGames } = require('./db/parser');
+const { getGames } = require('./db/parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,8 +24,8 @@ app.get('/api/status', (req, res) => {
 app.get('/api/games', async (req, res) => {
     try {
         await downloadDatabase();
-        const games = await getInstalledGames();
-        res.json({ status: 'success', count: games.length, games });
+        const games = await getGames();
+        res.json(games);
     } catch (error) {
         console.error('Failed to load games:', error);
         const connectionFailure = ['ETIMEDOUT', 'ECONNREFUSED', 'EHOSTUNREACH', 'ENETUNREACH'].includes(error.code);
