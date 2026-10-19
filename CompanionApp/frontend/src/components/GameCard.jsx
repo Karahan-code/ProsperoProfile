@@ -53,10 +53,10 @@ export default function GameCard({ game, status = 'planning', onStatusChange }) 
 
   return (
     <article className={`group min-w-0 overflow-hidden rounded-lg border border-white/10 border-l-2 ${statusStyle.border} bg-slate-900/60 shadow-lg shadow-black/10 backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:border-white/20`}>
-      <div className={`relative isolate aspect-[16/10] overflow-hidden bg-gradient-to-br ${cover}`}>
+      <div className={`relative isolate aspect-16/10 overflow-hidden bg-linear-to-br ${cover}`}>
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_72%_25%,rgba(255,255,255,0.34),transparent_22%),linear-gradient(135deg,transparent_42%,rgba(0,0,0,0.55))]" />
-        <div aria-hidden="true" className="absolute -right-10 top-5 size-44 rounded-full border border-white/20 [transform:scaleX(1.45)_rotate(-25deg)]" />
-        <div aria-hidden="true" className="absolute -right-5 top-10 size-36 rounded-full border border-white/20 [transform:scaleX(1.45)_rotate(30deg)]" />
+        <div aria-hidden="true" className="absolute -right-10 top-5 size-44 rounded-full border border-white/20 transform-[scaleX(1.45)_rotate(-25deg)]" />
+        <div aria-hidden="true" className="absolute -right-5 top-10 size-36 rounded-full border border-white/20 transform-[scaleX(1.45)_rotate(30deg)]" />
         <span className={`absolute left-3 top-3 rounded-sm px-2 py-1 text-[10px] font-bold text-white shadow ${platform === 'PS4' ? 'bg-blue-700' : 'bg-black/85'}`}>{platform}</span>
         <span className="absolute inset-0 grid place-items-center text-6xl font-semibold text-white/75 [text-shadow:0_3px_24px_rgba(0,0,0,0.35)]">{initialsFor(title)}</span>
         <span className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-[9px] text-white/70">
@@ -72,10 +72,10 @@ export default function GameCard({ game, status = 'planning', onStatusChange }) 
           <span className="inline-flex items-center gap-1.5 text-slate-400"><Trophy size={13} className="text-amber-200" /> {trophies.earned === null || trophies.total === null ? '-- / --' : `${trophies.earned} / ${trophies.total}`}</span>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10" aria-label={trophies.total === null ? 'Trophy progress unavailable' : `${Math.round(progress)} percent trophy progress`}>
-          <div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-yellow-100 transition-[width] duration-500" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-full bg-linear-to-r from-amber-300 to-yellow-100 transition-[width] duration-500" style={{ width: `${progress}%` }} />
         </div>
 
-        <label className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.08] pt-3">
+        <label className="mt-4 flex items-center justify-between gap-2 border-t border-white/8 pt-3">
           <span className="flex min-w-0 items-center gap-2 text-xs text-slate-400">
             <span className={`size-2 shrink-0 rounded-full ${statusStyle.dot}`} />
             <span className={statusStyle.text}>{GAME_STATUSES.find((option) => option.value === currentStatus)?.label}</span>

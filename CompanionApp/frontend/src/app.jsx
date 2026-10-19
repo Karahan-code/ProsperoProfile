@@ -53,16 +53,21 @@ function summarizeGames(games) {
   const playtimeValues = games.map(getPlaytimeHours).filter((value) => value !== null)
   const trophyValues = games.map(getTrophies)
   const trophyKinds = ['bronze', 'silver', 'gold', 'platinum']
-  const hasTrophyData = trophyValues.some((value) => value.total !== null || trophyKinds.some((kind) => value[kind] !== null))
+  const earnedValues = trophyValues.map((value) => value.earned).filter((value) => value !== null)
+  const hasCategoryData = trophyValues.some((value) => trophyKinds.some((kind) => value[kind] !== null))
+  const categoryTotals = Object.fromEntries(trophyKinds.map((kind) => {
+    const values = trophyValues.map((value) => value[kind]).filter((value) => value !== null)
+    return [kind, values.length ? values.reduce((total, value) => total + value, 0) : null]
+  }))
 
   return {
     playtimeHours: playtimeValues.length ? playtimeValues.reduce((total, value) => total + value, 0) : null,
-    trophies: hasTrophyData
-      ? Object.fromEntries(trophyKinds.map((kind) => [kind, trophyValues.reduce((total, value) => total + (value[kind] || 0), 0)]))
-      : null,
-    trophyTotal: hasTrophyData
-      ? trophyKinds.reduce((total, kind) => total + trophyValues.reduce((sum, value) => sum + (value[kind] || 0), 0), 0)
-      : null,
+    trophies: hasCategoryData ? categoryTotals : null,
+    trophyTotal: earnedValues.length
+      ? earnedValues.reduce((total, value) => total + value, 0)
+      : hasCategoryData
+        ? Object.values(categoryTotals).reduce((total, value) => total + (value || 0), 0)
+        : null,
   }
 }
 
