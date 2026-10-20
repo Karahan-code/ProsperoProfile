@@ -42,21 +42,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     opacity: 1;
     transform: translate(-50%, -50%) scale(1.15);
   }
-  42% {
+  38% {
     top: 50%;
     left: 50%;
     opacity: 1;
     transform: translate(-50%, -50%) scale(1.28);
   }
-  82% {
+  80% {
     opacity: 1;
   }
   100% {
     top: 18px;
     left: calc(max((100vw - 1440px) / 2, 0px) + var(--splash-inset));
-    opacity: 0;
-    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    transform: translate(0, 0) scale(0.65);
   }
+}
+
+@keyframes splash-overlay-exit {
+  0%, 84% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes app-content-enter {
@@ -72,7 +77,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .splash-logo-flight {
   --splash-inset: 16px;
   position: absolute;
-  animation: splash-logo-flight 1.5s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  animation: splash-logo-flight 2s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.splash-overlay {
+  animation: splash-overlay-exit 2s ease-out both;
+}
+
+.animate-fade-in {
+  animation: app-content-enter 500ms ease-out both;
 }
 
 @media (min-width: 640px) {

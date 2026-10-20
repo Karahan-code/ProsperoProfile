@@ -58,7 +58,12 @@ Create a `.env` file in the `backend` directory and add your PS5's local IP addr
 ```env
 PORT=3000
 PS5_IP=192.168.1.XXX
+STEAMGRIDDB_API_KEY=your_steamgriddb_api_key
 ```
+`STEAMGRIDDB_API_KEY` is optional. When configured, the backend searches SteamGridDB and fetches cover grids, hero backgrounds, and transparent logos. Missing keys, unmatched games, or missing individual assets use generated placeholder URLs.
+
+Profile data is loaded and saved through the backend API and stored as JSON under `CompanionApp/backend/src/profile/` by username. The profile directory is created automatically when the first profile is saved.
+
 *(Note: The Smart Fetcher will automatically detect the correct port: 1337, 2121, 21, or 8080).*
 
 Start the backend server:

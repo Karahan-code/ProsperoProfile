@@ -1,5 +1,6 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const { addGameAssets } = require('../services/imageService');
 
 const defaultDatabasePath = path.resolve(__dirname, '../../local_app.db');
 const tableCandidates = ['tbl_contentinfo', 'tbl_appbrowse', 'tbl_appinfo'];
@@ -37,6 +38,7 @@ function quoteIdentifier(identifier) {
 
 async function getGames(databasePath = defaultDatabasePath) {
 	const database = await openDatabase(databasePath);
+	let games;
 
 	try {
 		const tables = await queryAll(
@@ -83,7 +85,7 @@ async function getGames(databasePath = defaultDatabasePath) {
 			parameters.push('PPSA%', 'CUSA%');
 		}
 
-		return await queryAll(
+		games = await queryAll(
 			database,
 			`SELECT ${titleId} AS titleId, ${titleName} AS titleName
 			 FROM ${quoteIdentifier(tableName)}
@@ -94,6 +96,8 @@ async function getGames(databasePath = defaultDatabasePath) {
 	} finally {
 		await closeDatabase(database);
 	}
+
+	return addGameAssets(games, 'titleName');
 }
 
 module.exports = { getGames };
