@@ -39,6 +39,6 @@ app.get('/api/games', async (req, res) => {
 console.log("OKUNAN IP: >" + process.env.PS5_IP + "< PORT: >" + process.env.PS5_FTP_PORT + "<");
 
 app.listen(PORT, () => {
-    console.log(`🚀 ProsperoProfile Sunucusu çalışıyor: http://localhost:${PORT}`);
-    console.log(`🔌 Hedef PS5 IP: ${process.env.PS5_IP}:${process.env.PS5_FTP_PORT}`);
+    console.log(` ProsperoProfile Sunucusu çalışıyor: http://localhost:${PORT}`);
+    console.log(` Hedef PS5 IP: ${process.env.PS5_IP}:${process.env.PS5_FTP_PORT}`);
 });
