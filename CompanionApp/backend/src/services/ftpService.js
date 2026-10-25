@@ -12,10 +12,57 @@ const HTTP_TIMEOUT_MS = 15000;
 const REMOTE_DATABASE_PATH = '/system_data/priv/mms/app.db';
 
 let activeDownload = null;
+let activeConsoleIp = null;
 
-function downloadDatabase() {
+async function connectToConsole(ipAddress) {
+	if (!isPrivateIpv4(ipAddress)) {
+		throw new Error('Enter a valid private IPv4 address for your console.');
+	}
+
+	for (const port of FTP_PORTS) {
+		const client = new Client(FTP_CONNECT_TIMEOUT_MS);
+		client.prepareTransfer = enterPassiveModeIPv4;
+
+		try {
+			await withTimeout(
+				client.access({ host: ipAddress, port, secure: false }),
+				FTP_CONNECT_TIMEOUT_MS,
+				`FTP connection to ${ipAddress}:${port} timed out.`
+			);
+			setConsoleHost(ipAddress);
+			return { host: ipAddress, port };
+		} catch (error) {
+			console.info(`[FTP] Connection check on port ${port} failed: ${getErrorCode(error)}`);
+		} finally {
+			client.close();
+		}
+	}
+
+	throw new Error('Connection timed out. Check IP and payload.');
+}
+
+function setConsoleHost(ipAddress) {
+	if (!isPrivateIpv4(ipAddress)) {
+		throw new Error('Enter a valid private IPv4 address for your console.');
+	}
+	activeConsoleIp = ipAddress;
+}
+
+function isPrivateIpv4(ipAddress) {
+	if (typeof ipAddress !== 'string') return false;
+	const octets = ipAddress.split('.');
+	if (octets.length !== 4 || octets.some((octet) => !/^\d{1,3}$/.test(octet))) return false;
+
+	const [first, second, third, fourth] = octets.map(Number);
+	if ([first, second, third, fourth].some((octet) => octet < 0 || octet > 255)) return false;
+	return first === 10
+		|| (first === 172 && second >= 16 && second <= 31)
+		|| (first === 192 && second === 168);
+}
+
+function downloadDatabase(ipAddress = activeConsoleIp || process.env.PS5_IP?.trim()) {
 	if (!activeDownload) {
-		activeDownload = downloadDatabaseOnce().finally(() => {
+		activeDownload = downloadDatabaseOnce(ipAddress).finally(() => {
 			activeDownload = null;
 		});
 	}
@@ -23,10 +70,9 @@ function downloadDatabase() {
 	return activeDownload;
 }
 
-async function downloadDatabaseOnce() {
-	const host = process.env.PS5_IP?.trim();
+async function downloadDatabaseOnce(host) {
 	if (!host) {
-		throw new Error('Set a valid PS5_IP in the backend environment.');
+		throw new Error('Connect a console or set a valid PS5_IP in the backend environment.');
 	}
 
 	const localDbPath = path.resolve(__dirname, '../../local_app.db');
@@ -111,4 +157,4 @@ function withTimeout(promise, timeoutMs, message) {
 	return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-module.exports = { downloadDatabase };
+module.exports = { connectToConsole, downloadDatabase, setConsoleHost };

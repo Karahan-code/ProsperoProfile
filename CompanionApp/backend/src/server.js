@@ -4,17 +4,71 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs/promises');
 const path = require('path');
-const { downloadDatabase } = require('./services/ftpService');
+const { connectToConsole, downloadDatabase, setConsoleHost } = require('./services/ftpService');
 const { addGameAssets, getGameAssets } = require('./services/imageService');
 const { getGames } = require('./db/parser');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3001;
 const PROFILE_DIRECTORY = path.join(__dirname, 'profile');
+const FRONTEND_URL = 'http://localhost:3000';
 
 // Frontend'in bu sunucuyla sorunsuz konuşabilmesi için CORS izni veriyoruz
 app.use(cors());
 app.use(express.json());
+
+app.get('/', (req, res) => {
+    res.type('html').send(`
+        <!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>ProsperoProfile</title>
+            <style>
+                body {
+                    margin: 0;
+                    min-height: 100vh;
+                    display: grid;
+                    place-items: center;
+                    font-family: Arial, sans-serif;
+                    background: #0b1020;
+                    color: #e5eefb;
+                }
+                .card {
+                    width: min(680px, 90vw);
+                    background: rgba(17, 24, 39, 0.9);
+                    border: 1px solid rgba(148, 163, 184, 0.3);
+                    border-radius: 16px;
+                    padding: 32px;
+                    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+                }
+                h1 { margin-top: 0; }
+                a {
+                    color: #7dd3fc;
+                    text-decoration: none;
+                }
+                code {
+                    background: rgba(148, 163, 184, 0.12);
+                    padding: 2px 6px;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>ProsperoProfile backend is running.</h1>
+                <p>The app UI is served by the frontend on <a href="${FRONTEND_URL}">${FRONTEND_URL}</a>.</p>
+                <p>Use the API status endpoint: <code>http://localhost:${PORT}/api/status</code></p>
+                <p>If the frontend is not running yet, start it with:</p>
+                <pre>cd CompanionApp/frontend
+npm install
+npm run dev</pre>
+            </div>
+        </body>
+        </html>
+    `);
+});
 
 // İlk test rotamız (Endpoint)
 app.get('/api/status', (req, res) => {
@@ -23,6 +77,30 @@ app.get('/api/status', (req, res) => {
         message: "ProsperoProfile Backend Aktif!",
         target_console: process.env.PS5_IP
     });
+});
+
+app.post('/api/connect', async (req, res) => {
+    const { ipAddress } = req.body || {};
+    if (typeof ipAddress !== 'string' || !ipAddress.trim()) {
+        return res.status(400).json({
+            success: false,
+            error: 'A PS5 private IPv4 address is required.',
+        });
+    }
+
+    try {
+        const connection = await connectToConsole(ipAddress.trim());
+        res.json({ success: true, message: 'Connected', port: connection.port });
+    } catch (error) {
+        console.error(`Failed to connect to console at ${ipAddress}:`, error.message);
+        const invalidAddress = error.message === 'Enter a valid private IPv4 address for your console.';
+        res.status(invalidAddress ? 400 : 502).json({
+            success: false,
+            error: invalidAddress
+                ? error.message
+                : 'Connection timed out. Check IP and Payload.',
+        });
+    }
 });
 
 app.get('/api/game-assets', async (req, res) => {
@@ -79,6 +157,14 @@ app.get('/api/profile/:username', async (req, res) => {
         const profile = JSON.parse(contents);
         if (!Array.isArray(profile.games)) {
             return res.status(500).json({ status: 'error', message: 'Saved profile has an invalid games list.' });
+        }
+        if (profile.connectionMode === 'console') {
+            try {
+                setConsoleHost(profile.consoleIp);
+            } catch (error) {
+                console.error(`Saved profile "${username}" has an invalid console IP:`, error.message);
+                return res.status(500).json({ status: 'error', message: 'Saved profile has an invalid console IP.' });
+            }
         }
         profile.games = await addGameAssets(profile.games);
         res.json(profile);

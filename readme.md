@@ -14,7 +14,7 @@ Built with a futuristic, dark-themed glassmorphism aesthetic, it transforms stat
 ## 🌌 Vision & Features
 
 * **Smart Console Connection:** Automatically scans and connects to your PS5 via FTP or HTTP depending on your active payload (etaHEN, Standalone FTP, or Web File Manager). No complex configurations needed.
-* **First-Launch Onboarding:** Set up your local profile with a custom avatar and username before diving into your collection.
+* **First-Launch Onboarding:** Choose an avatar and either create a local profile or link a PS5 using its private LAN IP address.
 * **Steam-Style Dashboard:** A comprehensive header displaying your global statistics, total hours played, and overall trophy progress at a glance.
 * **MyAnimeList-Style Tracking:** Take control of your backlog. Categorize your games into custom lists: *Playing*, *Completed*, *Planning to play*, or *Dropped*, complete with color-coded visual indicators.
 * **Console-Specific Badging:** Dynamic UI elements that automatically detect and badge your titles with iconic "PS5" or "PS4" tags.
@@ -56,7 +56,7 @@ npm install
 
 Create a `.env` file in the `backend` directory and add your PS5's local IP address:
 ```env
-PORT=3000
+PORT=3001
 PS5_IP=192.168.1.XXX
 STEAMGRIDDB_API_KEY=your_steamgriddb_api_key
 ```
@@ -79,7 +79,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser. Complete the initial profile setup and watch your PS5 library come to life!
+Open `http://localhost:3000` in your browser. Choose **Local Mode** to use a profile without connecting to a console, or select **Console Link** and enter the PS5's private network IP address. Console Link checks supported FTP ports (1337, 2121, and 21); make sure the console is online and its FTP payload is running.
 
 ---
 

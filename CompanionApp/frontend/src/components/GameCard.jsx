@@ -66,10 +66,10 @@ function StatusDropdown({ status, onStatusChange, title }) {
   }
 
   return (
-    <div className="relative min-w-0 max-w-[58%]">
+    <div className="relative w-full min-w-[130px] xl:w-auto xl:flex-1 xl:max-w-[58%]">
       <button
         ref={triggerRef}
-        className="inline-flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-white/10 bg-slate-950/70 px-2.5 py-1.5 text-[11px] text-slate-300 outline-none transition-all duration-200 hover:border-white/20 hover:bg-white/[0.07] focus-visible:border-lime-300/40"
+        className="flex w-full cursor-pointer items-center justify-between gap-2 whitespace-nowrap rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] text-slate-300 outline-none transition-colors duration-200 hover:bg-white/10 focus-visible:border-lime-300/40"
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -85,7 +85,7 @@ function StatusDropdown({ status, onStatusChange, title }) {
       >
         <span className="flex min-w-0 items-center gap-2">
           <span className={`size-1.5 shrink-0 rounded-full ${statusStyle.dot}`} />
-          <span className={`truncate ${statusStyle.text}`}>{currentOption?.label}</span>
+          <span className={`whitespace-nowrap ${statusStyle.text}`}>{currentOption?.label}</span>
         </span>
         <ChevronDown size={12} aria-hidden="true" className={`shrink-0 text-slate-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -129,10 +129,6 @@ function StatusDropdown({ status, onStatusChange, title }) {
   )
 }
 
-function initialsFor(title = '') {
-  return title.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join('').toUpperCase() || '?'
-}
-
 function numberOrNull(value) {
   if (value === null || value === undefined || value === '') return null
   const number = Number(value)
@@ -157,10 +153,11 @@ export default function GameCard({ game, status = 'planning', onStatusChange, on
   const trophies = gameTrophies(game)
   const progress = trophies.total > 0 && trophies.earned !== null ? Math.min(100, (trophies.earned / trophies.total) * 100) : 0
   const artwork = getGameArtwork(game)
+  const hasPlatinum = trophies.earned !== null && trophies.total !== null && trophies.total > 0 && trophies.earned === trophies.total
 
   return (
     <article
-      className={`group min-w-0 rounded-lg border border-white/10 border-l-2 ${statusStyle.border} bg-slate-900/60 shadow-lg shadow-black/10 backdrop-blur-xl transition-all duration-500 ease-out hover:z-30 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/30 hover:shadow-[0_0_28px_rgba(148,163,184,0.12)]`}
+      className={`group min-w-0 overflow-hidden rounded-xl border border-white/10 border-l-2 ${statusStyle.border} bg-slate-900/60 shadow-lg shadow-black/10 backdrop-blur-xl transition-all duration-500 ease-out hover:z-30 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/30 hover:shadow-[0_0_28px_rgba(148,163,184,0.12)]`}
       onMouseEnter={() => onArtworkHover?.(artwork)}
       onMouseLeave={() => onArtworkHover?.(null)}
       onFocus={() => onArtworkHover?.(artwork)}
@@ -169,13 +166,22 @@ export default function GameCard({ game, status = 'planning', onStatusChange, on
       }}
       data-sound="hover"
     >
-      <div className="relative isolate aspect-16/10 overflow-hidden rounded-tl-[7px] rounded-tr-[7px] bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-950">
+      <div className="relative isolate aspect-[3/4] overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-800 to-slate-950">
         <img src={artwork} alt="" className="absolute inset-0 z-0 size-full object-cover transition duration-700 group-hover:scale-110" />
-        <div aria-hidden="true" className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(6,9,18,0.06),rgba(6,9,18,0.72)),radial-gradient(circle_at_72%_25%,rgba(255,255,255,0.2),transparent_26%)]" />
+        <div aria-hidden="true" className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(6,9,18,0.08),rgba(6,9,18,0.78)),radial-gradient(circle_at_72%_25%,rgba(255,255,255,0.22),transparent_26%)]" />
         <div aria-hidden="true" className="absolute -right-10 top-5 z-10 size-44 rounded-full border border-white/20 transform-[scaleX(1.45)_rotate(-25deg)]" />
         <div aria-hidden="true" className="absolute -right-5 top-10 z-10 size-36 rounded-full border border-white/20 transform-[scaleX(1.45)_rotate(30deg)]" />
-        <span className={`absolute left-3 top-3 z-20 rounded-sm px-2 py-1 text-[10px] font-bold text-white shadow ${platform === 'PS4' ? 'bg-blue-700' : 'bg-black/65 backdrop-blur-sm'}`}>{platform}</span>
-        <span className="absolute inset-0 z-20 grid place-items-center text-6xl font-semibold text-white/75 [text-shadow:0_3px_24px_rgba(0,0,0,0.35)]">{initialsFor(title)}</span>
+
+        {hasPlatinum && (
+          <div className="absolute left-2.5 top-2.5 z-20 inline-flex items-center gap-1.5 rounded-full border border-sky-200/50 bg-gradient-to-br from-slate-100 via-sky-200 to-slate-400 px-2 py-1 shadow-[0_0_18px_rgba(125,211,252,0.35)]">
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="size-3 text-slate-800">
+              <path d="M7 3h10v2h2a2 2 0 0 1 2 2v2.5A4.5 4.5 0 0 1 18.5 14H17v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3H5.5A4.5 4.5 0 0 1 1 9.5V7a2 2 0 0 1 2-2h2V3Zm0 4h10V5H7v2Zm-2 3.5a2.5 2.5 0 0 0 2.5 2.5H8v2h8v-2h.5A2.5 2.5 0 0 0 19 10.5V7H5v3.5Z" fill="currentColor" />
+            </svg>
+            <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-900">Platinum</span>
+          </div>
+        )}
+
+        <span className={`absolute right-2.5 top-2.5 z-20 rounded-full px-2 py-1 text-[9px] font-bold text-white shadow ${platform === 'PS4' ? 'bg-blue-700/90' : 'bg-black/65 backdrop-blur-sm'}`}>{platform}</span>
         <span className="absolute bottom-3 left-3 right-3 z-20 flex items-end justify-between gap-3 text-[9px] text-white/70">
           <span className="truncate">{titleId || 'TITLE ID UNAVAILABLE'}</span>
           <span className="shrink-0">GAME ARCHIVE</span>
@@ -192,7 +198,7 @@ export default function GameCard({ game, status = 'planning', onStatusChange, on
           <div className="h-full rounded-full bg-linear-to-r from-amber-300 to-yellow-100 transition-[width] duration-500" style={{ width: `${progress}%` }} />
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/8 pt-3">
+        <div className="mt-4 flex flex-col items-stretch gap-2 border-t border-white/8 pt-3 xl:flex-row xl:items-center xl:justify-between">
           <span className="flex min-w-0 items-center gap-2 text-xs text-slate-400">
             <span className={`size-2 shrink-0 rounded-full ${statusStyle.dot}`} />
             <span className={statusStyle.text}>{GAME_STATUSES.find((option) => option.value === currentStatus)?.label}</span>
